@@ -128,11 +128,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\objloader.hpp" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\System.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\objloader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shader\back.frag" />
+    <None Include="res\shader\back.vert" />
+    <None Include="res\shader\teapot.frag" />
+    <None Include="res\shader\teapot.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,6 +18,15 @@
     <ClInclude Include="include\System.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="include\Shader.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\objloader.hpp">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stb_image.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -26,5 +35,22 @@
     <ClCompile Include="src\glad.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="src\objloader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shader\back.vert">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\shader\back.frag">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\shader\teapot.vert">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\shader\teapot.frag">
+      <Filter>리소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>
