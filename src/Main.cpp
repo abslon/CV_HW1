@@ -16,8 +16,7 @@ class MainApplication
 public:
 	MainApplication() 
 	{
-		InitGL();
-		CVTest();
+		
 	}
 
 	~MainApplication()
@@ -25,22 +24,12 @@ public:
 		Terminate();
 	}
 
-	int RenderLoop()
+	// Main function for application
+	void Start()
 	{
-		while(!glfwWindowShouldClose(window))
-		{
-			// process input
-			processInput(window);
-
-			// render (only clearcolor for now...)
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
-
-			// swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-		return 0;
+		InitGL();
+		CVTest();
+		RenderLoop();
 	}
 
 private:
@@ -81,10 +70,29 @@ private:
 		return true;
 	}
 
+
 	void CVTest()
 	{
 		cv::Mat testImg = cv::Mat::zeros(cv::Size(300, 400), CV_8U);
 		cv::imshow("test", testImg);
+	}
+
+	// GLFW rendering loop function
+	void RenderLoop()
+	{
+		while (!glfwWindowShouldClose(window))
+		{
+			// process input
+			processInput(window);
+
+			// render (only clearcolor for now...)
+			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+
+			// swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 	}
 
 	// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -102,6 +110,7 @@ private:
 
 private:
 	GLFWwindow* window;
+	cv::VideoCapture video;
 };
 
 int main()
@@ -109,7 +118,7 @@ int main()
 	cout << "HW1 started" << endl;
 
 	MainApplication app;
-	app.RenderLoop();
+	app.Start();
 
 	return 0;
 }
