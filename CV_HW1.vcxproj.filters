@@ -21,10 +21,10 @@
     <ClInclude Include="include\Shader.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\objloader.hpp">
+    <ClInclude Include="include\stb_image.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\stb_image.h">
+    <ClInclude Include="include\tiny_obj_loader.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -33,9 +33,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\glad.c">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="src\objloader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
