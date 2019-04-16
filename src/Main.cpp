@@ -76,40 +76,54 @@ private:
 	{
 		
 		cv::Mat testImg = cv::Mat::zeros(cv::Size(400, 400), CV_8UC3);
+
 		////draw circle
 		//cv::circle(testImg, cvPoint(140, 170), 25, CV_RGB(0, 100, 100),10);
 		////draw filled circle
 		//cv::circle(testImg, cvPoint(200, 170), 25, CV_RGB(0, 300, 100), CV_FILLED,10);
 		//// or
 		//cv::circle(testImg, cvPoint(260, 170), 25, CV_RGB(0, 100, 100), -1);//thickness set to -1
-		//draw line
-		cv::line(testImg, cvPoint(20, 100), cvPoint(200, 100), CV_RGB(110, 220, 0), 2, 8);
-		//draw arrowed line
-		cv::arrowedLine(testImg, cvPoint(20, 200), cvPoint(200, 200), CV_RGB(100, 100, 100), 5);
-		//draw arrowed line
-		cv::arrowedLine(testImg, cvPoint(20, 300), cvPoint(200, 300), CV_RGB(100, 0, 100), 5 , CV_AA, 0, 0.4);
+		
+		////draw line
+		//cv::line(testImg, cvPoint(20, 100), cvPoint(200, 100), CV_RGB(110, 220, 0), 2, 8);
+		////draw arrowed line
+		//cv::arrowedLine(testImg, cvPoint(20, 200), cvPoint(200, 200), CV_RGB(100, 100, 100), 5);
+		////draw arrowed line
+		//cv::arrowedLine(testImg, cvPoint(20, 300), cvPoint(200, 300), CV_RGB(100, 0, 100), 5 , CV_AA, 0, 0.7);
 		////draw ellipse
 		//cv::ellipse(testImg, cvPoint(200, 150), cvSize(100, 150), 45, 0, 360, CV_RGB(255, 0, 0),  3, 8);
 		////draw filled rectangle
 		//cv::rectangle(testImg, cvPoint(15, 20), cvPoint(100, 80), CV_RGB(0, 55, 255), CV_FILLED);
 		////draw polygon
 		//DrawPolygon(testImg);
-		//////draw contour
-		////DrawContour(testImg);
-		////draw text
-		//cv::putText(testImg, "Computer Vision", cvPoint(50, 350), CV_FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0,143,143), 2);
-		
+		//draw contour
+		//DrawContour(testImg);
+		//draw text
+		cv::putText(testImg, "Computer Vision", cvPoint(50, testImg.rows/2), CV_FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0,143,143), 2);
 		cv::imshow("test", testImg);
+
 	}
 	void DrawContour(cv::Mat img) {
-		//cv::Point contours;
-		//cv::Vec4i heirarchy;
-		//cv::findContours()
 
-		//cv::findContours(img, contours, heirarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+		//Prepare the image for findContours
+		cv::cvtColor(img, img, CV_BGR2GRAY);
+		cv::threshold(img, img, 128, 255, CV_THRESH_BINARY);
 
-		//const cv::Point* cpt[1] = { cont_points[0] };
-		//cv::drawContours(img, cpt, -1, CV_RGB(255, 255, 0));
+		//Find the contours. Use the contourOutput Mat so the original image doesn't get overwritten
+		std::vector<std::vector<cv::Point> > contours;
+		cv::Mat contourOutput = img.clone();
+		cv::findContours(contourOutput, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+
+		//Draw the contours
+		cv::Mat contourImage(img.size(), CV_8UC3, cv::Scalar(0, 0, 0));
+		cv::Scalar colors[3];
+		colors[0] = cv::Scalar(255, 0, 0);
+		colors[1] = cv::Scalar(0, 255, 0);
+		colors[2] = cv::Scalar(0, 0, 255);
+		for (size_t idx = 0; idx < contours.size(); idx++) {
+			cv::drawContours(contourImage, contours, idx, colors[idx % 3]);
+		}
+		cv::imshow("contour", contourImage);
 	}
 	void DrawPolygon(cv::Mat img) {
 		int lineType = 8;
