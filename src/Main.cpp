@@ -1,6 +1,7 @@
 #include "System.h"
 #include <GLFW/glfw3.h>
 #include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
 // all callback functions must be declared in 'C' style.
@@ -73,8 +74,55 @@ private:
 
 	void CVTest()
 	{
-		cv::Mat testImg = cv::Mat::zeros(cv::Size(300, 400), CV_8U);
+		
+		cv::Mat testImg = cv::Mat::zeros(cv::Size(400, 400), CV_8UC3);
+		//draw circle
+		cv::circle(testImg, cvPoint(200, 200), 25, CV_RGB(0, 100, 100),10);
+		//draw filled circle
+		cv::circle(testImg, cvPoint(350, 200), 25, CV_RGB(0, 300, 100), CV_FILLED,10);
+		// or
+		cv::circle(testImg, cvPoint(280, 200), 25, CV_RGB(0, 100, 100), -1);//thickness set to -1
+		//draw line
+		cv::line(testImg, cvPoint(10, 0), cvPoint(10, 100), CV_RGB(110, 220, 0), 2, 8);
+		//draw arrowed line
+		cv::arrowedLine(testImg, cvPoint(20, 200), cvPoint(200, 200), CV_RGB(100, 100, 100), 5);
+		//draw ellipse
+		cv::ellipse(testImg, cvPoint(200, 150), cvSize(100, 150), 45, 0, 360, CV_RGB(255, 0, 0),  3, 8);
+		//draw filled rectangle
+		cv::rectangle(testImg, cvPoint(15, 20), cvPoint(70, 50), CV_RGB(0, 55, 255), CV_FILLED);
+		//draw polygon
+		DrawPolygon(testImg);
+		//draw contour
+		DrawContour(testImg);
+		//draw text
+		cv::putText(testImg, "Computer Vision", cvPoint(150, testImg.rows/2), CV_FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0,143,143), 2);
+		
 		cv::imshow("test", testImg);
+	}
+	void DrawContour(cv::Mat img) {
+		cv::Point contours;
+		cv::Vec4i heirarchy;
+		cv::findContours()
+
+		cv::findContours(img, contours, heirarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+
+		const cv::Point* cpt[1] = { cont_points[0] };
+		cv::drawContours(img, cpt, -1, CV_RGB(255, 255, 0));
+	}
+	void DrawPolygon(cv::Mat img) {
+		int lineType = 8;
+		int w = 200;
+		cv::Point poly_points[1][5];
+		poly_points[0][0] = cv::Point(w / 2.0+w, w+w);
+		poly_points[0][1] = cv::Point(10 + w, 2 * w / 3.0 + w);
+		poly_points[0][2] = cv::Point(1*w / 4.0 + w, 10 + w);
+		poly_points[0][3] = cv::Point(3*w / 4.0 + w, 10 + w);
+		poly_points[0][4] = cv::Point(w + w, 2 * w / 3.0 + w);
+
+
+		const cv::Point* ppt[1] = { poly_points[0] }; //the vertices of the polygon are the set of points in here
+		int npt[] = { 5 };//the total number of vertices to be drawn are npt, only one polygon will be drawn
+		cv::fillPoly(img, ppt, npt, 1, CV_RGB(0, 0, 255), lineType);
 	}
 
 	// GLFW rendering loop function
