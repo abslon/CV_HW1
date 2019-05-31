@@ -20,12 +20,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/transform.hpp>
 
 using namespace std;
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
-const float FPS = 29.99f;
+const double FPS = 29.99;
 
 /// camera parameters of Galaxy Note 5
 float fx = 959.562f;

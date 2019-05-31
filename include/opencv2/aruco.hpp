@@ -387,8 +387,8 @@ class CV_EXPORTS_W GridBoard : public Board {
  * Note that returning a 0 means the pose has not been estimated.
  */
 CV_EXPORTS_W int estimatePoseBoard(InputArrayOfArrays corners, InputArray ids, const Ptr<Board> &board,
-                                   InputArray cameraMatrix, InputArray distCoeffs, OutputArray rvec,
-                                   OutputArray tvec, bool useExtrinsicGuess = false);
+                                   InputArray cameraMatrix, InputArray distCoeffs, InputOutputArray rvec,
+                                   InputOutputArray tvec, bool useExtrinsicGuess = false);
 
 
 
@@ -471,6 +471,8 @@ CV_EXPORTS_W void drawDetectedMarkers(InputOutputArray image, InputArrayOfArrays
  *
  * Given the pose estimation of a marker or board, this function draws the axis of the world
  * coordinate system, i.e. the system centered on the marker/board. Useful for debugging purposes.
+ *
+ * @deprecated use cv::drawFrameAxes
  */
 CV_EXPORTS_W void drawAxis(InputOutputArray image, InputArray cameraMatrix, InputArray distCoeffs,
                            InputArray rvec, InputArray tvec, float length);

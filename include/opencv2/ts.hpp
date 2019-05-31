@@ -51,6 +51,44 @@
 # endif
 #endif
 
+
+
+// most part of OpenCV tests are fit into 200Mb limit, but some tests are not:
+// Note: due memory fragmentation real limits are usually lower on 20-25% (400Mb memory usage goes into mem_1Gb class)
+#define CV_TEST_TAG_MEMORY_512MB "mem_512mb"     // used memory: 200..512Mb - enabled by default
+#define CV_TEST_TAG_MEMORY_1GB "mem_1gb"         // used memory: 512Mb..1Gb - enabled by default
+#define CV_TEST_TAG_MEMORY_2GB "mem_2gb"         // used memory: 1..2Gb - enabled by default on 64-bit configuration (32-bit - disabled)
+#define CV_TEST_TAG_MEMORY_6GB "mem_6gb"         // used memory: 2..6Gb - disabled by default
+#define CV_TEST_TAG_MEMORY_14GB "mem_14gb"       // used memory: 6..14Gb - disabled by default
+
+// Large / huge video streams or complex workloads
+#define CV_TEST_TAG_LONG "long"                  // 5+ seconds on modern desktop machine (single thread)
+#define CV_TEST_TAG_VERYLONG "verylong"          // 20+ seconds on modern desktop machine (single thread)
+
+// Large / huge video streams or complex workloads for debug builds
+#define CV_TEST_TAG_DEBUG_LONG "debug_long"           // 10+ seconds on modern desktop machine (single thread)
+#define CV_TEST_TAG_DEBUG_VERYLONG "debug_verylong"   // 40+ seconds on modern desktop machine (single thread)
+
+// Lets skip processing of high resolution images via instrumentation tools (valgrind/coverage/sanitizers).
+// It is enough to run lower resolution (VGA: 640x480) tests.
+#define CV_TEST_TAG_SIZE_HD "size_hd"            // 720p+, enabled
+#define CV_TEST_TAG_SIZE_FULLHD "size_fullhd"    // 1080p+, enabled (disable these tests for valgrind/coverage run)
+#define CV_TEST_TAG_SIZE_4K "size_4k"            // 2160p+, enabled (disable these tests for valgrind/coverage run)
+
+// Other misc test tags
+#define CV_TEST_TAG_TYPE_64F "type_64f"          // CV_64F, enabled (disable these tests on low power embedded devices)
+
+// Kernel-based image processing
+#define CV_TEST_TAG_FILTER_SMALL "filter_small"       // Filtering with kernels <= 3x3
+#define CV_TEST_TAG_FILTER_MEDIUM "filter_medium"     // Filtering with kernels: 3x3 < kernel <= 5x5
+#define CV_TEST_TAG_FILTER_LARGE "filter_large"       // Filtering with kernels: 5x5 < kernel <= 9x9
+#define CV_TEST_TAG_FILTER_HUGE "filter_huge"         // Filtering with kernels: > 9x9
+
+// Other tests categories
+#define CV_TEST_TAG_OPENCL "opencl"              // Tests with OpenCL
+
+
+
 #ifdef WINRT
     #pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 #endif
@@ -150,6 +188,30 @@ public:
     SkipTestException(const cv::String& message) : dummy(0) { this->msg = message; }
 };
 
+/** Apply tag to the current test
+
+Automatically apply corresponding additional tags (for example, 4K => FHD => HD => VGA).
+
+If tag is in skip list, then SkipTestException is thrown
+*/
+void applyTestTag(const std::string& tag);
+
+/** Run postponed checks of applied test tags
+
+If tag is in skip list, then SkipTestException is thrown
+*/
+void checkTestTags();
+
+void applyTestTag_(const std::string& tag);
+
+static inline void applyTestTag(const std::string& tag1, const std::string& tag2)
+{ applyTestTag_(tag1); applyTestTag_(tag2); checkTestTags(); }
+static inline void applyTestTag(const std::string& tag1, const std::string& tag2, const std::string& tag3)
+{ applyTestTag_(tag1); applyTestTag_(tag2); applyTestTag_(tag3); checkTestTags(); }
+static inline void applyTestTag(const std::string& tag1, const std::string& tag2, const std::string& tag3, const std::string& tag4)
+{ applyTestTag_(tag1); applyTestTag_(tag2); applyTestTag_(tag3); applyTestTag_(tag4); checkTestTags(); }
+
+
 class TS;
 
 int64 readSeed(const char* str);
@@ -186,7 +248,7 @@ double getMaxVal(int depth);
 
 Size randomSize(RNG& rng, double maxSizeLog);
 void randomSize(RNG& rng, int minDims, int maxDims, double maxSizeLog, vector<int>& sz);
-int randomType(RNG& rng, int typeMask, int minChannels, int maxChannels);
+int randomType(RNG& rng, cv::_OutputArray::DepthMask typeMask, int minChannels, int maxChannels);
 Mat randomMat(RNG& rng, Size size, int type, double minVal, double maxVal, bool useRoi);
 Mat randomMat(RNG& rng, const vector<int>& size, int type, double minVal, double maxVal, bool useRoi);
 void add(const Mat& a, double alpha, const Mat& b, double beta,
@@ -222,7 +284,7 @@ void copyMakeBorder(const Mat& src, Mat& dst, int top, int bottom, int left, int
 Mat calcSobelKernel2D( int dx, int dy, int apertureSize, int origin=0 );
 Mat calcLaplaceKernel2D( int aperture_size );
 
-void initUndistortMap( const Mat& a, const Mat& k, Size sz, Mat& mapx, Mat& mapy );
+void initUndistortMap( const Mat& a, const Mat& k, const Mat& R, const Mat& new_a, Size sz, Mat& mapx, Mat& mapy, int map_type );
 
 void minMaxLoc(const Mat& src, double* minval, double* maxval,
                           vector<int>* minloc, vector<int>* maxloc, const Mat& mask=Mat());
@@ -319,7 +381,7 @@ protected:
     int test_case_count; // the total number of test cases
 
     // read test params
-    virtual int read_params( CvFileStorage* fs );
+    virtual int read_params( const cv::FileStorage& fs );
 
     // returns the number of tests or -1 if it is unknown a-priori
     virtual int get_test_case_count();
@@ -337,7 +399,7 @@ protected:
     virtual int update_progress( int progress, int test_case_idx, int count, double dt );
 
     // finds test parameter
-    const CvFileNode* find_param( CvFileStorage* fs, const char* param_name );
+    cv::FileNode find_param( const cv::FileStorage& fs, const char* param_name );
 
     // name of the test (it is possible to locate a test by its name)
     string name;
@@ -544,7 +606,7 @@ public:
 
 protected:
 
-    virtual int read_params( CvFileStorage* fs ) CV_OVERRIDE;
+    virtual int read_params( const cv::FileStorage& fs ) CV_OVERRIDE;
     virtual int prepare_test_case( int test_case_idx ) CV_OVERRIDE;
     virtual int validate_test_results( int test_case_idx ) CV_OVERRIDE;
 
@@ -596,7 +658,7 @@ protected:
         catch(const cv::Exception& e)
         {
             thrown = true;
-            if( e.code != expected_code )
+            if( e.code != expected_code && e.code != cv::Error::StsAssert && e.code != cv::Error::StsError )
             {
                 ts->printf(TS::LOG, "%s (test case #%d): the error code %d is different from the expected %d\n",
                     descr, test_case_idx, e.code, expected_code);

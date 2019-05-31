@@ -141,12 +141,19 @@ namespace cv
 {
 CV_EXPORTS void scalarToRawData(const cv::Scalar& s, void* buf, int type, int unroll_to = 0);
 
-//! Allocate all memory buffers which will not be freed, ease filtering memcheck issues
+//! Allocate memory buffers which will not be freed, ease filtering memcheck issues. Uses fastMalloc() call.
 CV_EXPORTS void* allocSingletonBuffer(size_t size);
 
-//! Allocate all memory buffers which will not be freed, ease filtering memcheck issues
+//! Allocate memory buffers which will not be freed, ease filtering memcheck issues. Uses fastMalloc() call
 template <typename T> static inline
 T* allocSingleton(size_t count = 1) { return static_cast<T*>(allocSingletonBuffer(sizeof(T) * count)); }
+
+//! Allocate memory buffers which will not be freed, ease filtering memcheck issues. Uses generic malloc() call.
+CV_EXPORTS void* allocSingletonNewBuffer(size_t size);
+
+//! Allocate memory buffers which will not be freed, ease filtering memcheck issues.  Uses generic malloc() call.
+template <typename T> static inline
+T* allocSingletonNew() { return new(allocSingletonNewBuffer(sizeof(T))) T(); }
 
 } // namespace
 
@@ -179,6 +186,8 @@ T* allocSingleton(size_t count = 1) { return static_cast<T*>(allocSingletonBuffe
 /****************************************************************************************\
 *                     Structures and macros for integration with IPP                     *
 \****************************************************************************************/
+
+#define OPENCV_IPP_REDUCE_SIZE 1
 
 // Temporary disabled named IPP region. Accuracy
 #define IPP_DISABLE_PYRAMIDS_UP         1 // Different results
@@ -639,15 +648,6 @@ typedef enum CvStatus
 }
 CvStatus;
 
-#ifdef HAVE_TEGRA_OPTIMIZATION
-namespace tegra {
-
-CV_EXPORTS bool useTegra();
-CV_EXPORTS void setUseTegra(bool flag);
-
-}
-#endif
-
 #ifdef ENABLE_INSTRUMENTATION
 namespace cv
 {
@@ -871,6 +871,10 @@ Passed subdirectories are used in LIFO order.
 @note Implementation is not thread-safe.
 */
 CV_EXPORTS void addDataSearchSubDirectory(const cv::String& subdir);
+
+/** @brief Return location of OpenCV libraries or current executable
+ */
+CV_EXPORTS std::string getBinLocation();
 
 //! @}
 
